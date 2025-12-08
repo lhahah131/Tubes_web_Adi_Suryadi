@@ -9,11 +9,44 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
-            background: linear-gradient(135deg, #f0f4ff 0%, #f8faff 100%);
+            background-image: url('{{ asset('images/school-bg.jpg') }}');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5); /* Dark overlay untuk readability */
+            z-index: -1;
         }
 
         .card-shadow {
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            background-color: rgba(255, 255, 255, 0.95) !important;
+        }
+
+
+        .logo-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 15px;
+            border-radius: 16px;
+        }
+
+
+        .logo-container h1,
+        .logo-container p {
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            color: white !important;
         }
 
         .input-focus {
@@ -83,8 +116,8 @@
 <body class="min-h-screen flex items-center justify-center p-4">
     <div class="w-full max-w-md">
         <!-- Logo & Header -->
-        <div class="logo-container text-center mb-8">
-            <div class="flex justify-center mb-4">
+        <div class="logo-container text-center mb-4">
+            <div class="flex justify-center mb-3">
                 <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg">
                     <i class="fas fa-qrcode text-white text-2xl"></i>
                 </div>
