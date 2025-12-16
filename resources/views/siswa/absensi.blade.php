@@ -41,6 +41,9 @@
             <div class="p-6">
                 <h2 class="text-xl font-bold text-gray-800 mb-6">Menu</h2>
                 <nav class="space-y-2">
+                    <a href="{{ route('siswa.dashboard') }}" class="block px-4 py-3 rounded-lg {{ request()->routeIs('siswa.dashboard') ? 'bg-blue-500 text-white' : 'text-gray-700 hover:bg-gray-100' }} transition">
+                        <i class="fas fa-home mr-3"></i>Dashboard
+                    </a>
                     <a href="{{ route('siswa.absensi') }}" class="block px-4 py-3 rounded-lg {{ request()->routeIs('siswa.absensi') ? 'bg-blue-500 text-white' : 'text-gray-700 hover:bg-gray-100' }} transition">
                         <i class="fas fa-qrcode mr-3"></i>Absensi QR
                     </a>
@@ -65,38 +68,7 @@
                     <p class="text-blue-100">Silakan scan QR code untuk melakukan absensi hari ini.</p>
                 </div>
 
-                <!-- Stats Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="bg-white rounded-lg shadow-md p-6">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-gray-600 text-sm">Total Hadir</p>
-                                <p class="text-3xl font-bold text-green-600">28</p>
-                            </div>
-                            <i class="fas fa-check-circle text-green-400 text-3xl opacity-30"></i>
-                        </div>
-                    </div>
 
-                    <div class="bg-white rounded-lg shadow-md p-6">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-gray-600 text-sm">Total Absen</p>
-                                <p class="text-3xl font-bold text-red-600">2</p>
-                            </div>
-                            <i class="fas fa-times-circle text-red-400 text-3xl opacity-30"></i>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-lg shadow-md p-6">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <p class="text-gray-600 text-sm">Persentase Kehadiran</p>
-                                <p class="text-3xl font-bold text-blue-600">93%</p>
-                            </div>
-                            <i class="fas fa-chart-pie text-blue-400 text-3xl opacity-30"></i>
-                        </div>
-                    </div>
-                </div>
 
                 <!-- QR Scanner Section -->
                 <div class="bg-white rounded-lg shadow-md p-8 text-center">

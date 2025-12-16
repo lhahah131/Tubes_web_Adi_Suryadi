@@ -212,6 +212,8 @@
                 </button>
             </form>
 
+
+
             <!-- Info Note -->
             <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                 <div class="flex items-start">
@@ -236,6 +238,8 @@
         const passwordInput = document.getElementById('password');
         const roleInputs = document.querySelectorAll('input[name="role"]');
         const submitButton = loginForm.querySelector('button[type="submit"]');
+
+
 
         // Toggle Password Visibility
         function togglePassword() {
@@ -320,8 +324,10 @@
             submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Memproses...';
 
             // Submit form setelah validasi berhasil
+            const form = this;
             setTimeout(() => {
-                this.submit();
+                // Use native submit to bypass event listener
+                HTMLFormElement.prototype.submit.call(form);
             }, 500);
         });
 

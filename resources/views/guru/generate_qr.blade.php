@@ -1,20 +1,9 @@
-<!DOCTYPE html>
-<html lang="id">
+@extends('layouts.app')
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Generate QR Code - Sistem Absensi QR</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+@section('content')
     <!-- QRCode.js Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
-        body {
-            background: linear-gradient(135deg, #f0f4ff 0%, #f8faff 100%);
-        }
-
         .qr-container {
             animation: fadeIn 0.6s ease-out;
         }
@@ -51,156 +40,114 @@
             }
         }
     </style>
-</head>
 
-<body class="min-h-screen">
-    <!-- Navigation -->
-    <nav class="bg-white shadow-md">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-            <div class="flex items-center">
-                <i class="fas fa-qrcode text-blue-600 text-2xl mr-3"></i>
-                <h1 class="text-2xl font-bold text-gray-800">Absensi QR</h1>
+    <div class="max-w-5xl mx-auto p-4 md:p-8">
+        <h2 class="text-3xl font-bold text-gray-800 mb-8">Generate QR Code Absensi</h2>
+
+        <!-- Session Info -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Informasi Sesi</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Kelas</label>
+                    <select id="kelasSelect" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
+                        <option value="X-A">X-A</option>
+                        <option value="X-B">X-B</option>
+                        <option value="XI-A">XI-A</option>
+                        <option value="XI-B">XI-B</option>
+                        <option value="XII-A">XII-A</option>
+                        <option value="XII-B">XII-B</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Mata Pelajaran</label>
+                    <input type="text" id="mataPelajaran" placeholder="Contoh: Matematika" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Tanggal</label>
+                    <input type="date" id="tanggal" value="{{ date('Y-m-d') }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Jam Pelajaran</label>
+                    <select id="jamPelajaran" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
+                        <option value="1">Jam ke-1 (07:00 - 07:45)</option>
+                        <option value="2">Jam ke-2 (07:45 - 08:30)</option>
+                        <option value="3">Jam ke-3 (08:30 - 09:15)</option>
+                        <option value="4">Jam ke-4 (09:15 - 10:00)</option>
+                        <option value="5">Jam ke-5 (10:15 - 11:00)</option>
+                        <option value="6">Jam ke-6 (11:00 - 11:45)</option>
+                        <option value="7">Jam ke-7 (12:30 - 13:15)</option>
+                        <option value="8">Jam ke-8 (13:15 - 14:00)</option>
+                    </select>
+                </div>
             </div>
-            <div class="flex items-center space-x-4">
-                <span class="text-gray-700">Halo, <strong>{{ Auth::user()->name }}</strong></span>
-                <form method="POST" action="{{ route('logout') }}" class="inline">
-                    @csrf
-                    <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition">
-                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
-                    </button>
-                </form>
-            </div>
+            <button onclick="generateQR()" class="mt-6 w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-lg transition font-semibold">
+                <i class="fas fa-qrcode mr-2"></i>Generate QR Code
+            </button>
         </div>
-    </nav>
 
-    <!-- Sidebar & Content -->
-    <div class="flex">
-        <!-- Sidebar -->
-        <div class="w-64 bg-white shadow-md min-h-screen">
-            <div class="p-6">
-                <h2 class="text-xl font-bold text-gray-800 mb-6">Menu</h2>
-                <nav class="space-y-2">
-                    <a href="{{ route('guru.absensi') }}" class="block px-4 py-3 rounded-lg {{ request()->routeIs('guru.absensi') ? 'bg-blue-500 text-white' : 'text-gray-700 hover:bg-gray-100' }} transition">
-                        <i class="fas fa-qrcode mr-3"></i>Generate QR
-                    </a>
-                    <a href="{{ route('guru.laporan') }}" class="block px-4 py-3 rounded-lg {{ request()->routeIs('guru.laporan') ? 'bg-blue-500 text-white' : 'text-gray-700 hover:bg-gray-100' }} transition">
-                        <i class="fas fa-chart-bar mr-3"></i>Laporan
-                    </a>
-                </nav>
-            </div>
-        </div>
-
-        <!-- Main Content -->
-        <div class="flex-1 p-8">
-            <div class="max-w-5xl mx-auto">
-                <h2 class="text-3xl font-bold text-gray-800 mb-8">Generate QR Code Absensi</h2>
-
-                <!-- Session Info -->
-                <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-                    <h3 class="text-xl font-bold text-gray-800 mb-4">Informasi Sesi</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- QR Code Display -->
+        <div id="qrSection" class="hidden qr-container">
+            <div class="bg-white rounded-lg shadow-md p-8">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4 text-center">QR Code Absensi</h3>
+                
+                <!-- Session Details -->
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                    <div class="grid grid-cols-2 gap-4 text-sm">
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Kelas</label>
-                            <select id="kelasSelect" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
-                                <option value="X-A">X-A</option>
-                                <option value="X-B">X-B</option>
-                                <option value="XI-A">XI-A</option>
-                                <option value="XI-B">XI-B</option>
-                                <option value="XII-A">XII-A</option>
-                                <option value="XII-B">XII-B</option>
-                            </select>
+                            <p class="text-gray-600 font-semibold">Kelas:</p>
+                            <p id="displayKelas" class="text-gray-800 font-bold">-</p>
                         </div>
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Mata Pelajaran</label>
-                            <input type="text" id="mataPelajaran" placeholder="Contoh: Matematika" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
+                            <p class="text-gray-600 font-semibold">Mata Pelajaran:</p>
+                            <p id="displayMapel" class="text-gray-800 font-bold">-</p>
                         </div>
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Tanggal</label>
-                            <input type="date" id="tanggal" value="{{ date('Y-m-d') }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
+                            <p class="text-gray-600 font-semibold">Tanggal:</p>
+                            <p id="displayTanggal" class="text-gray-800 font-bold">-</p>
                         </div>
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Jam Pelajaran</label>
-                            <select id="jamPelajaran" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
-                                <option value="1">Jam ke-1 (07:00 - 07:45)</option>
-                                <option value="2">Jam ke-2 (07:45 - 08:30)</option>
-                                <option value="3">Jam ke-3 (08:30 - 09:15)</option>
-                                <option value="4">Jam ke-4 (09:15 - 10:00)</option>
-                                <option value="5">Jam ke-5 (10:15 - 11:00)</option>
-                                <option value="6">Jam ke-6 (11:00 - 11:45)</option>
-                                <option value="7">Jam ke-7 (12:30 - 13:15)</option>
-                                <option value="8">Jam ke-8 (13:15 - 14:00)</option>
-                            </select>
+                            <p class="text-gray-600 font-semibold">Jam Pelajaran:</p>
+                            <p id="displayJam" class="text-gray-800 font-bold">-</p>
                         </div>
                     </div>
-                    <button onclick="generateQR()" class="mt-6 w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-lg transition font-semibold">
-                        <i class="fas fa-qrcode mr-2"></i>Generate QR Code
-                    </button>
+                    <div class="mt-4 flex items-center justify-center">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-3 h-3 bg-green-500 rounded-full pulse"></div>
+                            <span class="text-green-700 font-semibold">Sesi Aktif</span>
+                        </div>
+                        <span class="mx-3 text-gray-400">|</span>
+                        <span id="countdown" class="text-gray-600 font-mono">--:--</span>
+                    </div>
                 </div>
 
-                <!-- QR Code Display -->
-                <div id="qrSection" class="hidden qr-container">
-                    <div class="bg-white rounded-lg shadow-md p-8">
-                        <h3 class="text-2xl font-bold text-gray-800 mb-4 text-center">QR Code Absensi</h3>
-                        
-                        <!-- Session Details -->
-                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                            <div class="grid grid-cols-2 gap-4 text-sm">
-                                <div>
-                                    <p class="text-gray-600 font-semibold">Kelas:</p>
-                                    <p id="displayKelas" class="text-gray-800 font-bold">-</p>
-                                </div>
-                                <div>
-                                    <p class="text-gray-600 font-semibold">Mata Pelajaran:</p>
-                                    <p id="displayMapel" class="text-gray-800 font-bold">-</p>
-                                </div>
-                                <div>
-                                    <p class="text-gray-600 font-semibold">Tanggal:</p>
-                                    <p id="displayTanggal" class="text-gray-800 font-bold">-</p>
-                                </div>
-                                <div>
-                                    <p class="text-gray-600 font-semibold">Jam Pelajaran:</p>
-                                    <p id="displayJam" class="text-gray-800 font-bold">-</p>
-                                </div>
-                            </div>
-                            <div class="mt-4 flex items-center justify-center">
-                                <div class="flex items-center space-x-2">
-                                    <div class="w-3 h-3 bg-green-500 rounded-full pulse"></div>
-                                    <span class="text-green-700 font-semibold">Sesi Aktif</span>
-                                </div>
-                                <span class="mx-3 text-gray-400">|</span>
-                                <span id="countdown" class="text-gray-600 font-mono">--:--</span>
-                            </div>
-                        </div>
+                <!-- QR Code -->
+                <div class="text-center mb-6">
+                    <div id="qrcode" class="inline-block"></div>
+                </div>
 
-                        <!-- QR Code -->
-                        <div class="text-center mb-6">
-                            <div id="qrcode" class="inline-block"></div>
-                        </div>
+                <!-- Action Buttons -->
+                <div class="flex gap-4">
+                    <button onclick="downloadQR()" class="flex-1 bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg transition font-semibold">
+                        <i class="fas fa-download mr-2"></i>Download QR
+                    </button>
+                    <button onclick="resetQR()" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg transition font-semibold">
+                        <i class="fas fa-redo mr-2"></i>Generate Baru
+                    </button>
+                </div>
+            </div>
 
-                        <!-- Action Buttons -->
-                        <div class="flex gap-4">
-                            <button onclick="downloadQR()" class="flex-1 bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg transition font-semibold">
-                                <i class="fas fa-download mr-2"></i>Download QR
-                            </button>
-                            <button onclick="resetQR()" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg transition font-semibold">
-                                <i class="fas fa-redo mr-2"></i>Generate Baru
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Info -->
-                    <div class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                        <div class="flex items-start">
-                            <i class="fas fa-info-circle text-yellow-600 mt-0.5 mr-3 flex-shrink-0"></i>
-                            <div class="text-yellow-800 text-sm">
-                                <strong>Instruksi:</strong>
-                                <ul class="list-disc ml-5 mt-2 space-y-1">
-                                    <li>Tampilkan QR Code ini kepada siswa untuk di-scan</li>
-                                    <li>QR Code berlaku selama sesi absensi berlangsung</li>
-                                    <li>Download QR Code jika diperlukan untuk ditampilkan di proyektor</li>
-                                </ul>
-                            </div>
-                        </div>
+            <!-- Info -->
+            <div class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <div class="flex items-start">
+                    <i class="fas fa-info-circle text-yellow-600 mt-0.5 mr-3 flex-shrink-0"></i>
+                    <div class="text-yellow-800 text-sm">
+                        <strong>Instruksi:</strong>
+                        <ul class="list-disc ml-5 mt-2 space-y-1">
+                            <li>Tampilkan QR Code ini kepada siswa untuk di-scan</li>
+                            <li>QR Code berlaku selama sesi absensi berlangsung</li>
+                            <li>Download QR Code jika diperlukan untuk ditampilkan di proyektor</li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -211,7 +158,7 @@
         let qrCodeInstance = null;
         let countdownInterval = null;
 
-        function generateQR() {
+        async function generateQR() {
             const kelas = document.getElementById('kelasSelect').value;
             const mataPelajaran = document.getElementById('mataPelajaran').value;
             const tanggal = document.getElementById('tanggal').value;
@@ -224,53 +171,84 @@
                 return;
             }
 
-            // Create QR data
-            const qrData = {
-                guru_id: {{ Auth::id() }},
-                guru_name: '{{ Auth::user()->name }}',
-                kelas: kelas,
-                mata_pelajaran: mataPelajaran,
-                tanggal: tanggal,
-                jam_pelajaran: jamPelajaran,
-                timestamp: new Date().getTime(),
-                // Token untuk validasi
-                token: generateToken()
-            };
+            // Show Loading
+            const btn = document.querySelector('button[onclick="generateQR()"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Generating...';
+            btn.disabled = true;
 
-            const qrString = JSON.stringify(qrData);
+            try {
+                // 1. Request Valid Token from Backend
+                const response = await fetch("{{ route('guru.generate_qr.post') }}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').content,
+                        "Accept": "application/json"
+                    },
+                    body: JSON.stringify({
+                        kelas: kelas,
+                        mata_pelajaran: mataPelajaran,
+                        tanggal: tanggal,
+                        jam_pelajaran: jamPelajaran
+                    })
+                });
 
-            // Clear previous QR
-            const qrContainer = document.getElementById('qrcode');
-            qrContainer.innerHTML = '';
+                const result = await response.json();
 
-            // Generate new QR
-            qrCodeInstance = new QRCode(qrContainer, {
-                text: qrString,
-                width: 300,
-                height: 300,
-                colorDark: '#1e40af',
-                colorLight: '#ffffff',
-                correctLevel: QRCode.CorrectLevel.H
-            });
+                if (!response.ok) {
+                    throw new Error(result.error || 'Gagal membuat QR Code');
+                }
 
-            // Update display
-            document.getElementById('displayKelas').textContent = kelas;
-            document.getElementById('displayMapel').textContent = mataPelajaran;
-            document.getElementById('displayTanggal').textContent = formatDate(tanggal);
-            document.getElementById('displayJam').textContent = jamText;
+                // 2. Create Optimized QR data using Valid Token
+                // Note: result.qr_code is the VALID TOKEN saved in DB
+                const qrData = {
+                    g: {{ Auth::id() }},         // g = guru_id
+                    k: kelas,                    // k = kelas
+                    m: mataPelajaran,            // m = mata_pelajaran
+                    j: jamPelajaran,             // j = jam_pelajaran
+                    t: result.qr_code            // t = TOKEN VALID DARI DB ✅
+                };
 
-            // Show QR section
-            document.getElementById('qrSection').classList.remove('hidden');
+                const qrString = JSON.stringify(qrData);
 
-            // Start countdown (1 hour session)
-            startCountdown(60 * 60);
+                // Clear previous QR
+                const qrContainer = document.getElementById('qrcode');
+                qrContainer.innerHTML = '';
 
-            // Scroll to QR
-            document.getElementById('qrSection').scrollIntoView({ behavior: 'smooth' });
-        }
+                // Generate new QR
+                qrCodeInstance = new QRCode(qrContainer, {
+                    text: qrString,
+                    width: 300,
+                    height: 300,
+                    colorDark: '#1e40af',
+                    colorLight: '#ffffff',
+                    correctLevel: QRCode.CorrectLevel.L
+                });
 
-        function generateToken() {
-            return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+                // Update display
+                document.getElementById('displayKelas').textContent = kelas;
+                document.getElementById('displayMapel').textContent = mataPelajaran;
+                document.getElementById('displayTanggal').textContent = formatDate(tanggal);
+                document.getElementById('displayJam').textContent = jamText;
+
+                // Show QR section
+                document.getElementById('qrSection').classList.remove('hidden');
+
+                // Start countdown (15 min - sesuai validitas DB)
+                startCountdown(15 * 60);
+
+                // Scroll to QR
+                document.getElementById('qrSection').scrollIntoView({ behavior: 'smooth' });
+
+            } catch (err) {
+                console.error('Error:', err);
+                alert('Gagal generate QR: ' + err.message);
+            } finally {
+                // Reset Button
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
         }
 
         function formatDate(dateString) {
@@ -324,6 +302,4 @@
         // Set default date to today
         document.getElementById('tanggal').valueAsDate = new Date();
     </script>
-</body>
-
-</html>
+@endsection

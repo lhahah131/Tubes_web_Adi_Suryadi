@@ -15,7 +15,7 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::match(['get', 'post'], '/logout', [AuthController::class, 'logout'])->name('logout');
 
     // Dashboard Routes
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -25,10 +25,15 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [DashboardController::class, 'guruDashboard'])->name('guru.dashboard');
         Route::get('/absensi', [DashboardController::class, 'guruAbsensi'])->name('guru.absensi');
         Route::get('/generate-qr', [DashboardController::class, 'guruGenerateQR'])->name('guru.generate_qr');
+        Route::post('/generate-qr', [DashboardController::class, 'guruGenerateQR'])->name('guru.generate_qr.post'); // API for QR generation
         Route::get('/pengajuan-izin', [DashboardController::class, 'guruPengajuanIzin'])->name('guru.pengajuan_izin');
         Route::post('/pengajuan-izin/{id}/approve', [DashboardController::class, 'guruPengajuanApprove'])->name('guru.pengajuan_izin.approve');
         Route::post('/pengajuan-izin/{id}/reject', [DashboardController::class, 'guruPengajuanReject'])->name('guru.pengajuan_izin.reject');
+        Route::delete('/pengajuan-izin/{id}', [DashboardController::class, 'guruPengajuanDestroy'])->name('guru.pengajuan_izin.destroy');
         Route::get('/laporan', [DashboardController::class, 'guruLaporan'])->name('guru.laporan');
+        Route::get('/laporan/{id}', [DashboardController::class, 'guruLaporanDetail'])->name('guru.laporan.detail');
+        Route::delete('/absensi/{id}', [DashboardController::class, 'guruAbsensiDestroy'])->name('guru.absensi.destroy');
+        Route::delete('/absensi/clear/{id}', [DashboardController::class, 'guruAbsensiClear'])->name('guru.absensi.clear');
     });
 
     // Siswa Routes
@@ -36,6 +41,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [DashboardController::class, 'siswaDashboard'])->name('siswa.dashboard');
         Route::get('/absensi', [DashboardController::class, 'siswaAbsensi'])->name('siswa.absensi');
         Route::get('/scan-qr', [DashboardController::class, 'siswaScanQR'])->name('siswa.scan_qr');
+        Route::post('/scan-qr', [DashboardController::class, 'siswaScanQRSubmit'])->name('siswa.scan_qr.submit'); // CRITICAL: Handle QR scan from mobile
         Route::get('/pengajuan-izin', [DashboardController::class, 'siswaPengajuanIzin'])->name('siswa.pengajuan_izin');
         Route::post('/pengajuan-izin', [DashboardController::class, 'siswaPengajuanIzinStore'])->name('siswa.pengajuan_izin.store');
         Route::get('/riwayat', [DashboardController::class, 'siswaRiwayat'])->name('siswa.riwayat');
