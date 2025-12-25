@@ -1,4 +1,5 @@
 <?php
+// [ROUTE] Pengaturan Jalur URL & Navigasi Web
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
