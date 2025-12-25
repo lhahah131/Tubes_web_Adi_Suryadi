@@ -1,4 +1,5 @@
 <?php
+// [DB] Struktur Database & Migrations
 
 namespace Database\Seeders;
 
