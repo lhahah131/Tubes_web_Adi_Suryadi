@@ -4,6 +4,8 @@
     <div class="max-w-5xl mx-auto p-4 md:p-8">
         <h2 class="text-3xl font-bold text-gray-800 mb-8">Riwayat Absensi</h2>
 
+
+
         <!-- Attendance History -->
         <div class="space-y-4">
             <!-- Empty State / Data from Database -->
@@ -14,11 +16,14 @@
                             <p class="text-gray-600 text-sm">{{ \Carbon\Carbon::parse($attendance->tanggal)->isoFormat('dddd, D MMMM YYYY') }}</p>
                             <h3 class="text-lg font-bold text-gray-800">
                                 @if($attendance->status === 'hadir')
-                                    Jam Masuk: {{ $attendance->jam_masuk }}
+                                    Jam Masuk: {{ $attendance->jam_masuk }}<br>
+                                    <span class="text-sm font-normal text-gray-600">{{ $attendance->keterangan }}</span>
                                 @elseif($attendance->status === 'sakit')
-                                    Keterangan: Sakit
+                                    Keterangan: Sakit<br>
+                                    <span class="text-sm font-normal text-gray-600">{{ $attendance->keterangan }}</span>
                                 @elseif($attendance->status === 'izin')
-                                    Keterangan: Izin
+                                    Keterangan: Izin<br>
+                                    <span class="text-sm font-normal text-gray-600">{{ $attendance->keterangan }}</span>
                                 @else
                                     -
                                 @endif

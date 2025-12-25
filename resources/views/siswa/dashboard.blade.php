@@ -1,123 +1,143 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto px-4 py-6">
-    <!-- Welcome Banner with Date -->
-    <div class="bg-gradient-to-r from-blue-600 to-blue-500 rounded-xl shadow-lg p-6 mb-8 text-white relative overflow-hidden">
-        <div class="relative z-10">
-            <div class="flex justify-between items-start">
-                <div>
-                    <h1 class="text-3xl font-bold mb-2">Selamat Datang, {{ Auth::user()->name }}! 👋</h1>
-                    <p class="opacity-90">Silakan scan QR code untuk melakukan absensi hari ini.</p>
-                </div>
-                <div class="hidden md:block text-right">
-                    <p class="text-lg font-semibold">{{ \Carbon\Carbon::now()->isoFormat('dddd, D MMMM YYYY') }}</p>
-                </div>
-            </div>
+@php
+    // LOGIC VIEW (Agar tidak merubah Controller)
+    $siswa = Auth::user()->siswa;
+    $today = \Carbon\Carbon::today();
+    $sudahAbsen = \App\Models\Absensi::where('siswa_id', $siswa->id)
+                    ->whereDate('tanggal', $today)
+                    ->first();
+    
+    // Ambil 3 riwayat terakhir
+    $riwayatTerakhir = \App\Models\Absensi::where('siswa_id', $siswa->id)
+                        ->orderBy('created_at', 'desc')
+                        ->take(3)
+                        ->get();
+@endphp
+
+<div class="max-w-5xl mx-auto p-4 md:p-8 space-y-8">
+    
+    <!-- 1. Header Sederhana -->
+    <div class="flex items-center justify-between">
+        <div>
+            <p class="text-sm font-medium text-gray-500 mb-1 hidden md:block">{{ \Carbon\Carbon::now()->isoFormat('dddd, D MMMM YYYY') }}</p>
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800 tracking-tight">Halo, {{ explode(' ', Auth::user()->name)[0] }} 👋</h1>
+            <p class="text-sm md:text-base text-gray-400 mt-1">Siap untuk aktivitas hari ini?</p>
         </div>
-        <!-- Decorative Circle -->
-        <div class="absolute top-0 right-0 -mt-8 -mr-8 w-32 h-32 bg-white opacity-10 rounded-full blur-xl"></div>
+        <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gray-100 flex items-center justify-center border border-gray-200 shadow-sm">
+            <i class="fas fa-user text-gray-600 md:text-lg"></i>
+        </div>
     </div>
 
-    <!-- Stats Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+    <!-- GRID LAYOUT (Responsive: 1 col mobile, 2 col desktop) -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
         
-        <!-- Total Hadir -->
-        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition">
-            <div class="flex items-center justify-between mb-2">
-                <p class="text-sm text-gray-500 font-medium">Total Hadir</p>
-                <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                    <i class="fas fa-check-circle text-green-500 text-sm"></i>
+        <!-- KOLOM KIRI (Card Utama - Lebar 2 kolom di desktop) -->
+        <div class="lg:col-span-2">
+            <!-- 2. Primary Action Card (Status Absensi) -->
+            <div class="relative overflow-hidden rounded-3xl border border-gray-100 bg-white p-6 md:p-10 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] ring-1 ring-gray-900/5 transition-all hover:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.05)] h-full flex flex-col justify-center">
+                <div class="flex flex-col items-center justify-center text-center py-2 h-full">
+                    
+                    @if($sudahAbsen)
+                        <!-- State: Sudah Absen -->
+                        <div class="mb-6 inline-flex h-20 w-20 items-center justify-center rounded-full bg-green-50 text-green-500 shadow-sm ring-4 ring-green-50/50">
+                            <i class="fas fa-check text-3xl"></i>
+                        </div>
+                        <h3 class="text-xl md:text-2xl font-bold text-gray-900">Kamu Sudah Absen</h3>
+                        <p class="mt-2 text-gray-500 max-w-sm mx-auto">Absensi kamu tercatat pada pukul <strong class="text-gray-800">{{ \Carbon\Carbon::parse($sudahAbsen->jam_masuk)->format('H:i') }} WIB</strong>. Selamat belajar!</p>
+                        
+                        <div class="mt-8 w-full max-w-xs">
+                            <button disabled class="w-full flex items-center justify-center gap-2 rounded-xl bg-gray-50 px-6 py-3.5 text-sm font-semibold text-gray-400 cursor-not-allowed border border-gray-100">
+                                <i class="fas fa-qrcode"></i> Scan QR Lagi
+                            </button>
+                        </div>
+                    @else
+                        <!-- State: Belum Absen -->
+                        <div class="mb-6 inline-flex h-20 w-20 items-center justify-center rounded-full bg-blue-50 text-blue-600 shadow-sm ring-4 ring-blue-50/50 animate-pulse">
+                            <i class="fas fa-clock text-3xl"></i>
+                        </div>
+                        <h3 class="text-xl md:text-2xl font-bold text-gray-900">Belum Melakukan Absensi</h3>
+                        <p class="mt-2 text-gray-500 max-w-sm mx-auto">Silakan scan QR code yang ditampilkan guru di depan kelas untuk mencatat kehadiran.</p>
+                        
+                        <div class="mt-8 w-full max-w-xs">
+                            <a href="{{ route('siswa.scan_qr') }}" class="flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-200 hover:bg-blue-700 hover:shadow-blue-300 transition-all active:scale-[0.98]">
+                                <i class="fas fa-qrcode"></i> Scan QR Code
+                            </a>
+                        </div>
+                    @endif
                 </div>
             </div>
-            <h3 class="text-2xl font-bold text-gray-800">{{ $totalHadir }}</h3>
-            <p class="text-xs text-green-600 mt-1 flex items-center">
-                <i class="fas fa-arrow-up mr-1"></i> Kehadiran
-            </p>
         </div>
 
-        <!-- Total Sakit -->
-        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition">
-            <div class="flex items-center justify-between mb-2">
-                <p class="text-sm text-gray-500 font-medium">Total Sakit</p>
-                <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
-                    <i class="fas fa-procedures text-yellow-500 text-sm"></i>
-                </div>
-            </div>
-            <h3 class="text-2xl font-bold text-gray-800">{{ $totalSakit }}</h3>
-            <p class="text-xs text-gray-400 mt-1">Dengan surat dokter</p>
-        </div>
-
-        <!-- Total Izin -->
-        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition">
-            <div class="flex items-center justify-between mb-2">
-                <p class="text-sm text-gray-500 font-medium">Total Izin</p>
-                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                    <i class="fas fa-envelope-open-text text-blue-500 text-sm"></i>
-                </div>
-            </div>
-            <h3 class="text-2xl font-bold text-gray-800">{{ $totalIzin }}</h3>
-            <p class="text-xs text-gray-400 mt-1">Izin disetujui</p>
-        </div>
-
-        <!-- Total Absen -->
-        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition">
-            <div class="flex items-center justify-between mb-2">
-                <p class="text-sm text-gray-500 font-medium">Total Absen</p>
-                <div class="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
-                    <i class="fas fa-times-circle text-red-500 text-sm"></i>
-                </div>
-            </div>
-            <h3 class="text-2xl font-bold text-gray-800">{{ $totalAbsen }}</h3>
-            <p class="text-xs text-red-500 mt-1">Tanpa keterangan</p>
-        </div>
-
-         <!-- Persentase Kehadiran -->
-         <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition relative overflow-hidden">
-            <div class="relative z-10">
-                <div class="flex items-center justify-between mb-2">
-                    <p class="text-sm text-gray-500 font-medium">Persentase</p>
-                    <div class="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
-                        <i class="fas fa-chart-pie text-indigo-500 text-sm"></i>
+        <!-- KOLOM KANAN (Statistik & Riwayat) -->
+        <div class="space-y-6 md:space-y-8 flex flex-col mt-4 lg:mt-0">
+            
+            <!-- 3. Ringkasan Statistik (Grid Compact) -->
+            <div>
+                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 px-1">Statistik Semester Ini</h3>
+                <div class="grid grid-cols-2 gap-3">
+                    <!-- Hadir -->
+                    <div class="flex flex-col p-4 rounded-2xl bg-white border border-gray-100 shadow-sm hover:border-gray-200 transition">
+                        <span class="text-[10px] uppercase font-bold text-gray-400 mb-1">Hadir</span>
+                        <span class="text-2xl font-bold text-gray-800">{{ $totalHadir }}</span>
+                    </div>
+                    <!-- Izin -->
+                    <div class="flex flex-col p-4 rounded-2xl bg-white border border-gray-100 shadow-sm hover:border-gray-200 transition">
+                        <span class="text-[10px] uppercase font-bold text-gray-400 mb-1">Izin</span>
+                        <span class="text-2xl font-bold text-gray-800">{{ $totalIzin }}</span>
+                    </div>
+                    <!-- Sakit -->
+                    <div class="flex flex-col p-4 rounded-2xl bg-white border border-gray-100 shadow-sm hover:border-gray-200 transition">
+                        <span class="text-[10px] uppercase font-bold text-gray-400 mb-1">Sakit</span>
+                        <span class="text-2xl font-bold text-gray-800">{{ $totalSakit }}</span>
+                    </div>
+                    <!-- Absen -->
+                    <div class="flex flex-col p-4 rounded-2xl bg-white border border-red-100 shadow-sm hover:border-red-200 transition">
+                        <span class="text-[10px] uppercase font-bold text-red-300 mb-1">Absen</span>
+                        <span class="text-2xl font-bold text-red-500">{{ $totalAbsen }}</span>
                     </div>
                 </div>
-                <!-- Logic tambahan: Tampilkan 0% jika belum ada data agar tidak error -->
-                <h3 class="text-2xl font-bold text-indigo-600">{{ $persentaseKehadiran ?? 0 }}%</h3>
-                <div class="w-full bg-gray-200 rounded-full h-1.5 mt-2">
-                    <div class="bg-indigo-600 h-1.5 rounded-full" style="width: {{ $persentaseKehadiran ?? 0 }}%"></div>
+            </div>
+
+            <!-- 4. Riwayat Singkat (Clean List) -->
+            <div class="flex-1">
+                <div class="flex items-center justify-between mb-4 px-1 mt-2">
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest">Aktivitas Terakhir</h3>
+                    <a href="{{ route('siswa.riwayat') }}" class="text-xs font-semibold text-blue-600 hover:text-blue-700 transition">Lihat Semua</a>
+                </div>
+
+                <div class="space-y-3">
+                    @forelse($riwayatTerakhir as $log)
+                        <div class="flex items-center justify-between rounded-xl bg-white border border-gray-100 p-4 shadow-sm hover:shadow-md hover:border-gray-200 transition-all cursor-default">
+                            <div class="flex items-center gap-3">
+                                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full 
+                                    {{ $log->status == 'hadir' ? 'bg-green-50 text-green-600 ring-1 ring-green-100' : 
+                                      ($log->status == 'izin' ? 'bg-blue-50 text-blue-600 ring-1 ring-blue-100' : 
+                                      ($log->status == 'sakit' ? 'bg-yellow-50 text-yellow-600 ring-1 ring-yellow-100' : 'bg-red-50 text-red-600 ring-1 ring-red-100')) }}">
+                                    <i class="fas {{ $log->status == 'hadir' ? 'fa-check' : 'fa-info' }} text-sm"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="text-sm font-bold text-gray-800 capitalize truncate">{{ $log->keterangan ?? $log->status }}</p>
+                                    <p class="text-xs text-gray-400">
+                                        {{ \Carbon\Carbon::parse($log->tanggal)->isoFormat('dddd, D MMM') }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="shrink-0 text-right">
+                                <span class="text-xs font-bold text-gray-500 bg-gray-50 px-2.5 py-1 rounded-md">
+                                    {{ $log->jam_masuk ? \Carbon\Carbon::parse($log->jam_masuk)->format('H:i') : '-' }}
+                                </span>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="text-center py-8 rounded-xl border border-dashed border-gray-200 bg-gray-50/50">
+                            <p class="text-sm text-gray-400">Belum ada riwayat absensi.</p>
+                        </div>
+                    @endforelse
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Quick Actions -->
-    <h2 class="text-xl font-bold text-gray-800 mb-4 px-1">Menu Cepat</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <a href="{{ route('siswa.scan_qr') }}" class="group bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition flex items-center border-l-4 border-l-blue-500">
-            <div class="w-14 h-14 bg-blue-50 rounded-lg flex items-center justify-center mr-4 group-hover:scale-110 transition">
-                <i class="fas fa-qrcode text-blue-600 text-2xl"></i>
-            </div>
-            <div>
-                <h3 class="font-bold text-gray-800 group-hover:text-blue-600 transition">Scan QR Code</h3>
-                <p class="text-sm text-gray-500">Klik disni untuk melakukan absensi</p>
-            </div>
-            <div class="ml-auto text-gray-300 group-hover:text-blue-500 transition">
-                <i class="fas fa-chevron-right"></i>
-            </div>
-        </a>
-
-        <a href="{{ route('siswa.riwayat') }}" class="group bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition flex items-center border-l-4 border-l-purple-500">
-            <div class="w-14 h-14 bg-purple-50 rounded-lg flex items-center justify-center mr-4 group-hover:scale-110 transition">
-                <i class="fas fa-history text-purple-600 text-2xl"></i>
-            </div>
-            <div>
-                <h3 class="font-bold text-gray-800 group-hover:text-purple-600 transition">Riwayat Absensi</h3>
-                <p class="text-sm text-gray-500">Lihat semua catatan kehadiran Anda</p>
-            </div>
-            <div class="ml-auto text-gray-300 group-hover:text-purple-500 transition">
-                <i class="fas fa-chevron-right"></i>
-            </div>
-        </a>
     </div>
 </div>
 @endsection

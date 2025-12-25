@@ -107,6 +107,34 @@
                         required>
                 </div>
 
+                <!-- Tanggal Izin -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <label for="tanggal_mulai" class="block text-sm font-semibold text-gray-700 mb-2">
+                            Tanggal Mulai <span class="text-red-500">*</span>
+                        </label>
+                        <input 
+                            type="date" 
+                            id="tanggal_mulai" 
+                            name="tanggal_mulai" 
+                            value="{{ old('tanggal_mulai', date('Y-m-d')) }}"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" 
+                            required>
+                    </div>
+                    <div>
+                        <label for="tanggal_selesai" class="block text-sm font-semibold text-gray-700 mb-2">
+                            Tanggal Selesai <span class="text-red-500">*</span>
+                        </label>
+                        <input 
+                            type="date" 
+                            id="tanggal_selesai" 
+                            name="tanggal_selesai" 
+                            value="{{ old('tanggal_selesai', date('Y-m-d')) }}"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500" 
+                            required>
+                    </div>
+                </div>
+
                 <!-- Keterangan -->
                 <div class="mb-6">
                     <label for="keterangan" class="block text-sm font-semibold text-gray-700 mb-2">

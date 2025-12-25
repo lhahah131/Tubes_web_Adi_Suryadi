@@ -78,10 +78,10 @@ class AuthController extends Controller
 
         // Redirect berdasarkan role
         if ($user->role === 'guru') {
-            return redirect()->intended(route('guru.laporan'))
+            return redirect()->intended(route('guru.dashboard'))
                 ->with('success', 'Selamat datang, ' . $user->name . '!');
         } else {
-            return redirect()->intended(route('siswa.riwayat'))
+            return redirect()->intended(route('siswa.dashboard'))
                 ->with('success', 'Selamat datang, ' . $user->name . '!');
         }
     }
