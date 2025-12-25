@@ -1,4 +1,5 @@
 <?php
+// [PUBLIC] Aset Public (Gambar & CSS)
 
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
