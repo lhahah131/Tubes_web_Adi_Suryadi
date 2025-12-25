@@ -1,3 +1,4 @@
+<!-- [VIEW] Tampilan Frontend UI & Blade Templates -->
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
